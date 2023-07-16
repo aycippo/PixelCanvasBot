@@ -1,16 +1,20 @@
-struct Color {
-    id: i32,
-    name: &'static str,
-    red: u8,
-    green: u8,
-    blue: u8,
-    alpha: u8,
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
+pub(crate) struct RGB {
+    pub(crate) red: u8,
+    pub(crate) green: u8,
+    pub(crate) blue: u8,
 }
 
-struct RGB {
-    red: u8,
-    green: u8,
-    blue: u8,
+#[derive(Debug)]
+pub(crate) struct Color {
+    pub(crate) id: i32,
+    pub(crate) name: &'static str,
+    pub(crate) red: u8,
+    pub(crate) green: u8,
+    pub(crate) blue: u8,
+    pub(crate) alpha: u8,
 }
 
 impl Color {
@@ -25,7 +29,7 @@ impl Color {
         }
     }
 
-    fn index(id: i32) -> Color {
+    pub(crate) fn index(id: i32) -> Color {
         match id {
             -1 => BaseColors::Transparent.value(),
             1 => BaseColors::Gainsboro.value(),
@@ -47,36 +51,65 @@ impl Color {
         }
     }
 
-    fn rgb(rgb: RGB, silent: bool, sensitive: u8, brightness: u8) {}
+    pub(crate) fn rgb(rgb: RGB, silent: bool, sensitive: u8, brightness: u8) -> Color {
+        for color in BaseColors::iter() {
+            if (rgb.red == color.value().red
+                && rgb.green == color.value().green
+                && rgb.blue == color.value().blue)
+            {
+                return color.value();
+            }
+        }
 
-    // fn rgb(rgb: (u8, u8, u8), silent: bool, sensitive: u8, brightness: u8) -> Color {
-    //     let diff_min = [(255, 255, 255), 1038366];
+        Color {
+            id: 1,
+            name: "guh",
+            red: 1,
+            green: 1,
+            blue: 1,
+            alpha: 1,
+        }
+    }
 
-    //     for color in BaseColors {
-    //         if (color[0] == rgb[0] && color[1] == rgb[1] && color[2] == rgb[2]) {
-    //             color
-    //         }
-    //     }
+    // @staticmethod
+    // def rgb(rgb, silent=False, sensitive=1, brightness=0):
 
-    //     if (rgb[3] != 255) {
-    //         TRANSPARENT
-    //     }
+    //     # if that colors not in standart colors list
+    //     diff_min = [(255, 255, 255), 1038366]  # sqrt(255*255 + 255*255 + 255*255) = 441.67295593 --> Default white
 
-    //     for color in BaseColors {
-    //         if (color.id == -1) {
-    //             continue;
-    //         }
+    //     if rgb[3] != 255:
+    //         return EnumColor.index(-1)
 
-    //         let diff_r =((rgb[0]) + brightness) - color.rgba[0] * ((rgb[0] + brightness) - color.rgba[0]);
-    //         let diff_g =((rgb[1]) + brightness) - color.rgba[1] * ((rgb[1] + brightness) - color.rgba[1]);
-    //         let diff_b =((rgb[2]) + brightness) - color.rgba[2] * ((rgb[2] + brightness) - color.rgba[2]);
+    //     for color in EnumColor.ENUM:
+    //         if color.index == -1:
+    //             continue
+    //         # formula that sqrt( (x1 - x2)2 + (y1 - y2)2 + (z1 - z2)2 )
+    //         diff_r = ((rgb[0] + brightness) - color.rgb[0]) * ((rgb[0] + brightness) - color.rgb[0])
+    //         diff_g = ((rgb[1] + brightness) - color.rgb[1]) * ((rgb[1] + brightness) - color.rgb[1])
+    //         diff_b = ((rgb[2] + brightness) - color.rgb[2]) * ((rgb[2] + brightness) - color.rgb[2])
 
-    //         let x = cmp::max(diff_r, diff_g, diff_b);
-    //         println!("{}", x);
-    //     }
-    // }
+    //         x = min(diff_r, diff_g, diff_b)
+    //         z = max(diff_r, diff_g, diff_r)
+    //         y = (diff_r + diff_g + diff_b) - (x + z)
+
+    //         x = x / sensitive
+    //         z = z * sensitive
+
+    //         diffys = math.sqrt(x + y + z)
+
+    //         if diffys < diff_min[1]:
+    //             diff_min[1] = diffys
+    //             diff_min[0] = color.rgb
+
+    //     # return rounding colour
+
+    //     if not silent:
+    //         print(I18n.get(' %s colours rounded %s (%s) ') % (
+    //         str(rgb), str(diff_min[0]), I18n.get(str(EnumColor.rgb(diff_min[0]).name), 'true')))
+    //     return EnumColor.rgb(diff_min[0])
 }
 
+#[derive(Debug, EnumIter)]
 enum BaseColors {
     Transparent,
     White,
